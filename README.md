@@ -104,5 +104,17 @@ iex> sum.(2,3)
 # & shorthand for anonymous function
 iex> sub = &(&1 - &2)
 iex> sub.(2,1)
-1
+
+# Elixir uses pattern matching to check through all possible match options and
+# select the first matching option to run
+iex> handle_result = fn
+...>     {:ok, result} -> IO.puts "Result: #{result}"
+...>     {:error} -> IO.puts "An error has occured!"
+...> end
+iex> handle_result.({:ok, "success"})          
+Result: success
+:ok
+iex> handle_result.({:error})
+An error has occured!
+:ok
 ```
