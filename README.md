@@ -117,4 +117,41 @@ Result: success
 iex> handle_result.({:error})
 An error has occured!
 :ok
+
+# Function
+iex> defmodule Greeter do
+...>     def hello(name) do
+...>         "Hello, " <> name
+...>     end
+...> end
+iex> Greeter.hello("Sean")
+"Hello, Sean"
+
+# If our function body only spans one line, we can shorten it with `do:`
+iex> defmodule Greeter do
+...>     def hello(name), do: "Hello, " <> name
+...> end
+
+# Recursion with pattern matching
+iex> defmodule Length do
+...>     def of([]), do: 0
+...>     def of([_ | tail]), do: 1 + of(tail)
+...> end
+iex> Length.of([])
+0
+iex> Length.of([1,4,3])
+3
+
+# Arity (number of arguments)
+iex> defmodule Greeter2 do
+...>     def hello(), do: "Hello, anonymous person!"                # hello/0
+...>     def hello(name), do: "Hello, " <> name                     # hello/1
+...>     def hello(name1, name2), do: "Hello, #{name1} and #{name2}"# hello/2
+...> end
+iex> Greeter2.hello()
+"Hello, anonymous person!"
+iex> Greeter2.hello("Sunshine")
+"Hello, Sunshine"
+iex> Greeter2.hello("Sunshine", "Sugar")
+"Hello, Sunshine and Sugar"
 ```
