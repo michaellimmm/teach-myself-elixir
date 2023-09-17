@@ -1,4 +1,5 @@
 # Teach Myself Elixir
+
 This is brief introduction to the Elixir language through samples of its main features.
 
 ## String
@@ -71,7 +72,7 @@ iex> [{:foo, "bar"}, {:hello, "world"}]
 iex> [{:foo, "bar"}, {:hello, "world"}, {:foo, "baz"}]
 [foo: "bar", hello: "world", foo: "baz"]
 
-# Maps are key-value store. 
+# Maps are key-value store.
 # Unlike keyword list, they allow keys of any type and are un-ordered
 # You can define a map with `%{}` syntax
 iex> map = %{:foo => "bar", "hello" => :world}
@@ -111,7 +112,7 @@ iex> handle_result = fn
 ...>     {:ok, result} -> IO.puts "Result: #{result}"
 ...>     {:error} -> IO.puts "An error has occured!"
 ...> end
-iex> handle_result.({:ok, "success"})          
+iex> handle_result.({:ok, "success"})
 Result: success
 :ok
 iex> handle_result.({:error})
@@ -144,9 +145,9 @@ iex> Length.of([1,4,3])
 
 # Arity (number of arguments)
 iex> defmodule Greeter2 do
-...>     def hello(), do: "Hello, anonymous person!"                # hello/0
-...>     def hello(name), do: "Hello, " <> name                     # hello/1
-...>     def hello(name1, name2), do: "Hello, #{name1} and #{name2}"# hello/2
+...>     def hello(), do: "Hello, anonymous person!"                    # hello/0
+...>     def hello(name), do: "Hello, " <> name                         # hello/1
+...>     def hello(name1, name2), do: "Hello, #{name1} and #{name2}"    # hello/2
 ...> end
 iex> Greeter2.hello()
 "Hello, anonymous person!"
@@ -154,4 +155,93 @@ iex> Greeter2.hello("Sunshine")
 "Hello, Sunshine"
 iex> Greeter2.hello("Sunshine", "Sugar")
 "Hello, Sunshine and Sugar"
+
+# Function and Pattern Matching
+defmodule Greeter3 do
+    def hello(%{name: person_name}) do
+        IO.puts "Hello, " <> person_name
+    end
+end
+
+fred = %{name: "Fred", age: "95", favorite_color: "Taupe"}
+
+iex> Greeter3.hello(fred)
+Hello, Fred
+
+defmodule Greeter4 do
+    def hello(%{name: person_name} = person) do
+        IO.puts "Hello, " <> person_name
+        IO.inspect person
+    end
+end
+
+iex> Greeter4.hello(fred)
+Hello, Fred
+%{name: "Fred", age: "95", favorite_color: "Taupe"}
+
+# Private Functions
+defmodule Greeter5 do
+    def hello(name), do: phrase() <> name
+    defp phrase, do: "Hello, "
+end
+
+iex> Greeter5.hello("James")
+"Hello, James"
+
+# Guards
+defmodule Greeter6 do
+    def hello(names) when is_list(names) do
+        names = Enum.join(names, ", ")
+
+        hello(names)
+    end
+
+    def hello(name) when is_binary(name) do
+        phrase() <> name
+    end
+
+    defp phrase, do: "Hello, "
+end
+
+iex> Greeter6.hello ["Sean", "Steve"]
+"Hello, Sean, Steve"
+
+# Default Arguments
+defmodule Greeter7 do
+    def hello(name, language_code \\ "en") do
+        phrase(language_code) <> name
+    end
+
+    defp phrase("en"), do: "Hello, "
+    defp phrase("es"), do: "Hola, "
+end
+
+iex> Greeter7.hello("Sean", "en")
+"Hello, Sean"
+iex> Greeter7.hello("Sean")      
+"Hello, Sean"
+iex> Greeter7.hello("Sean", "es")
+"Hola, Sean"
+
+# Elixir doesn't like default arguments in multiple matching functions, 
+# it can be confusing. To handle this we can add a function head with our
+# default arguments:
+defmodule Greeter8 do
+    def hello(names, language_code \\ "en")
+    def hello(names, language_code) when is_list(names) do
+        names = Enum.join(names, ", ")
+        hello(names, language_code)
+    end
+
+    def hello(name, language_code) when is_binary(name) do
+        phrase(language_code) <> name
+    end
+
+    defp phrase("en"), do: "Hello, "
+    defp phrase("en"), do: "Hola, "
+end
+
+iex> Greeter8.hello(["Sean", "Steve"])
+"Hello, Sean, Steve"
+
 ```
