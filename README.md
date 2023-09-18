@@ -4,22 +4,65 @@ This is brief introduction to the Elixir language through samples of its main fe
 
 ## String
 
-### String Interpolation
-
 ```elixir
+# String Interpolation
 iex> name = "Sean"
 "Sean"
 iex> "Hello #{name}"
 "Hello Sean"
-```
 
-### String Concatenation
-
-```elixir
-iex> name = "Sean"
-"Sean"
+# String Concatenation
 iex> "Hello " <> name
 "Hello Sean"
+```
+
+# Pattern Matching
+
+```elixir
+# In elixir, '=' is used for assigning variables but also for the match operator.
+iex> x = 1
+1
+iex> x
+1
+iex> 1 = x
+1
+iex> 2 = x
+** (MatchError) no match of right hand side value: 1
+
+# The match operator isn't only used to match against simple values,
+# but it's also useful for destructuring more complex data type.
+iex> {a, b, c} = {:hello, "world", 42}
+{:hello, "world", 42}
+iex> a
+:hello
+iex> b
+"world"
+iex> c
+42
+iex> [head | tail] = [1, 2, 3]
+[1, 2, 3]
+iex> head
+1
+iex> tail
+[2, 3]
+
+# use the pin operator ^ when you want to pattern match against a existing variable value
+iex> z = 1
+1
+iex> ^z = 2
+** (MatchError) no match of right hand side value: 2
+iex> [^z, 3, 4] = [1, 3, 4]
+[1, 3, 4]
+
+# In some cases, you don't care about a particular value in a pattern. It's
+# common practice to bind those values to the underscore _
+iex> [head | _] = [1, 2, 3]
+[1, 2, 3]
+iex> head
+1
+iex> _
+error: invalid use of _. _ can only be used inside patterns to ignore values and cannot be used in expressions. Make sure you are inside a pattern or change it accordingly
+** (CompileError) cannot compile code (errors have been logged)
 ```
 
 ## Collections
@@ -157,90 +200,83 @@ iex> Greeter2.hello("Sunshine", "Sugar")
 "Hello, Sunshine and Sugar"
 
 # Function and Pattern Matching
-defmodule Greeter3 do
-    def hello(%{name: person_name}) do
-        IO.puts "Hello, " <> person_name
-    end
-end
-
-fred = %{name: "Fred", age: "95", favorite_color: "Taupe"}
-
+iex> defmodule Greeter3 do
+...>    def hello(%{name: person_name}) do
+...>        IO.puts "Hello, " <> person_name
+...>    end
+...> end
+iex> fred = %{name: "Fred", age: "95", favorite_color: "Taupe"}
+%{name: "Fred", age: "95", favorite_color: "Taupe"}
 iex> Greeter3.hello(fred)
 Hello, Fred
-
-defmodule Greeter4 do
-    def hello(%{name: person_name} = person) do
-        IO.puts "Hello, " <> person_name
-        IO.inspect person
-    end
-end
-
+iex> defmodule Greeter4 do
+...>     def hello(%{name: person_name} = person) do
+...>         IO.puts "Hello, " <> person_name
+...>         IO.inspect person
+...>     end
+...> end
 iex> Greeter4.hello(fred)
 Hello, Fred
 %{name: "Fred", age: "95", favorite_color: "Taupe"}
 
 # Private Functions
-defmodule Greeter5 do
-    def hello(name), do: phrase() <> name
-    defp phrase, do: "Hello, "
-end
-
+iex> defmodule Greeter5 do
+...>     def hello(name), do: phrase() <> name
+...>     defp phrase, do: "Hello, "
+...> end
 iex> Greeter5.hello("James")
 "Hello, James"
 
 # Guards
-defmodule Greeter6 do
-    def hello(names) when is_list(names) do
-        names = Enum.join(names, ", ")
-
-        hello(names)
-    end
-
-    def hello(name) when is_binary(name) do
-        phrase() <> name
-    end
-
-    defp phrase, do: "Hello, "
-end
-
+iex> defmodule Greeter6 do
+...>     def hello(names) when is_list(names) do
+...>         names = Enum.join(names, ", ")
+...>
+...>         hello(names)
+...>     end
+...>
+...>     def hello(name) when is_binary(name) do
+...>         phrase() <> name
+...>     end
+...>
+...>     defp phrase, do: "Hello, "
+...> end
 iex> Greeter6.hello ["Sean", "Steve"]
 "Hello, Sean, Steve"
 
 # Default Arguments
-defmodule Greeter7 do
-    def hello(name, language_code \\ "en") do
-        phrase(language_code) <> name
-    end
-
-    defp phrase("en"), do: "Hello, "
-    defp phrase("es"), do: "Hola, "
-end
-
+iex> defmodule Greeter7 do
+...>     def hello(name, language_code \\ "en") do
+...>         phrase(language_code) <> name
+...>     end
+...>
+...>     defp phrase("en"), do: "Hello, "
+...>     defp phrase("es"), do: "Hola, "
+...> end
 iex> Greeter7.hello("Sean", "en")
 "Hello, Sean"
-iex> Greeter7.hello("Sean")      
+iex> Greeter7.hello("Sean")
 "Hello, Sean"
 iex> Greeter7.hello("Sean", "es")
 "Hola, Sean"
 
-# Elixir doesn't like default arguments in multiple matching functions, 
+# Elixir doesn't like default arguments in multiple matching functions,
 # it can be confusing. To handle this we can add a function head with our
 # default arguments:
-defmodule Greeter8 do
-    def hello(names, language_code \\ "en")
-    def hello(names, language_code) when is_list(names) do
-        names = Enum.join(names, ", ")
-        hello(names, language_code)
-    end
-
-    def hello(name, language_code) when is_binary(name) do
-        phrase(language_code) <> name
-    end
-
-    defp phrase("en"), do: "Hello, "
-    defp phrase("en"), do: "Hola, "
-end
-
+iex> defmodule Greeter8 do
+...>     def hello(names, language_code \\ "en")
+...>     def hello(names, language_code) when is_list(names) do
+...>         names = Enum.join(names, ", ")
+...>         hello(names, language_code)
+...>     end
+...>
+...>     def hello(name, language_code) when is_binary(name) do
+...>         phrase(language_code) <> name
+...>     end
+...>
+...>     defp phrase("en"), do: "Hello, "
+...>     defp phrase("en"), do: "Hola, "
+...> end
 iex> Greeter8.hello(["Sean", "Steve"])
 "Hello, Sean, Steve"
 
